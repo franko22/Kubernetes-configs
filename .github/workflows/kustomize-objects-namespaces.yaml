@@ -13,7 +13,7 @@
 #
 
 ---
-name: Kubernetes Kustomize Installs
+name: Kustomize Objects Namespaces
 
 on:
   push:
@@ -21,13 +21,13 @@ on:
       - master
     paths:
       - '*.yaml'
-      - .github/workflows/k8s-test.yaml
+      - .github/workflows/kustomize-objects-namespaces.yaml
   pull_request:
     branches:
       - master
     paths:
       - '*.yaml'
-      - .github/workflows/k8s-test.yaml
+      - .github/workflows/kustomize-objects-namespaces.yaml
   workflow_dispatch:  # needs to be in default branch before you get the UI option to manually run though
     inputs:
       debug:
@@ -36,6 +36,9 @@ on:
         default: false
   schedule:
     - cron: '0 0 * * 1'
+
+env:
+  IGNORE_REGEX: 'eks|timescaledb'
 
 permissions:
   contents: read
@@ -48,31 +51,31 @@ defaults:
   run:
     shell: bash -euxo pipefail {0}
 
-
 jobs:
-  create-cluster:
-    name: Create Kind Cluster
-    runs-on: ubuntu-latest
+  kustomize-check-object-namespaces:
+    name: Kustomize Check Object Namespaces
+    runs-on: harisekhon/bash-tools:latest
     steps:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
-  install-kustomizations:
-    name: Install Kustomizations
-    needs:
-      - create-cluster
-    runs-on: harisekhon/bash-tools:latest
-    steps:
+
       - name: Install Kind
         run: install_kind.sh
 
       - name: Install Kustomize
         run: install_kustomize.sh
 
+      #- name: Install yq
+      #  run: install_yq.sh
+
       - name: Kind Version
         run: kind version
 
       - name: Kustomize Version
         run: kustomize version
+
+      - name: Yq Version
+        run: yq --version
 
       - name: Generate $KUBE_CONFIG
         run: |
@@ -85,8 +88,25 @@ jobs:
       - name: Install Kustomizations
         run: |
           for kustomization in *-kustomization.yaml; do
+            if [[ "$kustomization" =~ ^($IGNORE_REGEX)- ]]; then
+              echo "Skipping $kustomization"
+              echo
+            fi
             echo "$kustomization"
             cp -fv -- "$kustomization" kustomization.yaml
             kustomize build --enable-helm | kubectl apply -f -
+            echo
+          done
+
+      - name: Check objects without Explicit Namespaces
+        run: |
+          for kustomization in *-kustomization.yaml; do
+            if [[ "$kustomization" =~ ^($IGNORE_REGEX)- ]]; then
+              echo "Skipping $kustomization"
+              echo
+            fi
+            echo "$kustomization"
+            cp -fv -- "$kustomization" kustomization.yaml
+            kustomize_check_objects_namespaces.sh
             echo
           done
