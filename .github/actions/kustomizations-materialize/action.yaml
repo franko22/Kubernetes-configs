@@ -16,20 +16,21 @@
 name: Kustomize Materialize
 description: Materializes all *-kustomization.yaml to *.kustomization.yaml.materialized so that scanning tools can find problems in the resulting k8s yaml templates
 
-inputs:
-  #debug:
-  #  description: Enable Debug Mode
-  #  type: boolean
-  #  required: false
-  #  default: false
+#inputs:
+#  debug:
+#    description: Enable Debug Mode
+#    type: boolean
+#    required: false
+#    default: false
 
 runs:
   using: composite
   steps:
-    - shell: bash
-      name: Kustomizations Materialize
+    - name: Kustomizations Materialize
+      shell: bash
       run: |
         echo "Running Kustomizations Materialize Action"
+        set -euxo pipefail
         for kustomization in *-kustomization.yaml; do
           if [[ "$kustomization" =~ ^eks- ]]; then
             echo "Skipping $kustomization"
@@ -39,5 +40,6 @@ runs:
           echo "$kustomization"
           cp -fv -- "$kustomization" kustomization.yaml
           kustomize build --enable-helm > "$kustomization.materialized"
+          echo "Materialized YAML -> $kustomization.materialized"
           echo
         done

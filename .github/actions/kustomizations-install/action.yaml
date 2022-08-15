@@ -26,34 +26,43 @@ description: Installs each *-kustomization.yaml
 runs:
   using: composite
   steps:
-    - shell: bash
-      name: Install Kustomizations
+    - name: Install Kustomizations
+      shell: bash
       #env:
       #  DEBUG: ${{ inputs.debug }}
       run: |
         echo "Running Install Kustomizations Action"
         set -euxo pipefail
         for kustomization in *-kustomization.yaml; do
-          if [[ "$kustomization" =~ ^(eks|timescaledb|metrics-server)- ]]; then
+          if [[ "$kustomization" =~ ^(eks|metrics-server|prometheus-stack)- ]]; then
             echo "Skipping $kustomization"
             echo
             continue
           fi
           echo "$kustomization"
           cp -fv -- "$kustomization" kustomization.yaml
+          # too much noise listing the entire yamls in the logs
+          set +x
           yaml="$(kustomize build --enable-helm)"
+          set -x
           if ! kubectl apply -f - <<< "$yaml"; then
-            echo "Kustomize | Kubectl Apply failed. Waiting 5 secs before trying again"
+            echo "Kustomize | Kubectl Apply failed. Waiting 5 secs before trying again to give CRDs time to register and be recognized"
             sleep 5
             # workaround for prometheus-stack:
             #
             #   https://github.com/prometheus-community/helm-charts/issues/1500
             #
-            if kubectl apply -f - 2>&1 <<< "$yaml" | grep -q 'metadata.annotations: Too long'; then
-              kubectl replace -f - <<< "$yaml"
-            else
+            # XXX: for somet reason this doesn't trigger, fix this
+            #if kubectl apply -f - 2>&1 <<< "$yaml" | grep -q 'metadata.annotations: Too long'; then
+            #if [[ "$kustomization" =~ prometheus-stack ]]; then
+            # XXX: fails with:
+            #
+            #   Pod "kube-prometheus-stack-grafana-test" is invalid: spec: Forbidden: pod updates may not change fields other than ...
+            #
+            #  kubectl replace -f - <<< "$yaml"
+            #else
               kubectl apply -f - <<< "$yaml"
-            fi
+            #fi
           fi
           echo
         done

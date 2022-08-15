@@ -43,7 +43,8 @@ helmCharts:
 #
 #   CustomResourceDefinition.apiextensions.k8s.io "prometheuses.monitoring.coreos.com" is invalid: metadata.annotations: Too long: must have at most 262144 bytes
 #
-# https://github.com/argoproj/argo-cd/issues/8128
+#     https://github.com/argoproj/argo-cd/issues/8128
+#
 patchesJson6902:
   - target:
       group: apiextensions.k8s.io

@@ -16,34 +16,34 @@
 name: Install Kustomize
 description: Installs the latest or given version of Kustomize
 
-inputs:
-  #version:
-  #  description: Kustomize version to install
-  #  type: string
-  #  required: false
-  #debug:
-  #  description: Enable Debug Mode
-  #  type: boolean
-  #  required: false
-  #  default: false
+#inputs:
+#  #version:
+#  #  description: Kustomize version to install
+#  #  type: string
+#  #  required: false
+#  debug:
+#    description: Enable Debug Mode
+#    type: boolean
+#    required: false
+#    default: false
 
 runs:
   using: composite
   steps:
-    - shell: bash
-      name: Install Kustomize
+    - name: Install Kustomize
+      shell: bash
       run: |
         echo "Running Install Kustomize Action"
-        run: |
-          set -euxo pipefail
-          owner_repo="kubernetes-sigs/kustomize"
-          version="$(
-            curl -sSL --fail "https://api.github.com/repos/$owner_repo/releases" |
-            jq -r "limit(1; .[] | select(.tag_name | test(\"kustomize\")) | .tag_name)"
-          )"
-          version="${version##*/}"
-          wget -O /tmp/kustomize.tar.gz "https://github.com/$owner_repo/releases/download/kustomize%2F$version/kustomize_${version}_linux_amd64.tar.gz"
-          tar zxvf /tmp/kustomize.tar.gz -C /usr/local/bin/
+        set -euxo pipefail
+        owner_repo="kubernetes-sigs/kustomize"
+        version="$(
+          curl -sSL --fail "https://api.github.com/repos/$owner_repo/releases" |
+          jq -r "limit(1; .[] | select(.tag_name | test(\"kustomize\")) | .tag_name)"
+        )"
+        version="${version##*/}"
+        wget -O /tmp/kustomize.tar.gz "https://github.com/$owner_repo/releases/download/kustomize%2F$version/kustomize_${version}_linux_amd64.tar.gz"
+        tar zxvf /tmp/kustomize.tar.gz -C /usr/local/bin/
 
     - name: Kustomize Version
       run: kustomize version
+      shell: bash
