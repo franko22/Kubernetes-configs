@@ -38,7 +38,7 @@ on:
     - cron: '0 0 * * 1'
 
 env:
-  IGNORE_REGEX: 'eks|timescaledb'
+  IGNORE_REGEX: 'eks'
 
 permissions:
   contents: read
@@ -70,23 +70,10 @@ jobs:
       #- name: Kind Version
       #  run: kind version
 
-      - name: Install Kustomize
-        run: |
-          set -euxo pipefail
-          owner_repo="kubernetes-sigs/kustomize"
-          version="$(
-            curl -sSL --fail "https://api.github.com/repos/$owner_repo/releases" |
-            jq -r "limit(1; .[] | select(.tag_name | test(\"kustomize\")) | .tag_name)"
-          )"
-          version="${version##*/}"
-          wget -O /tmp/kustomize.tar.gz "https://github.com/$owner_repo/releases/download/kustomize%2F$version/kustomize_${version}_linux_amd64.tar.gz"
-          tar zxvf /tmp/kustomize.tar.gz -C /usr/local/bin/
+      - uses: ./.github/actions/install-kustomize
 
       - name: Install yq
         run: sudo apt-get install -y yq
-
-      - name: Kustomize Version
-        run: kustomize version
 
       - name: Yq Version
         run: yq --version
@@ -99,18 +86,7 @@ jobs:
       - name: Cluster Info
         run: kubectl cluster-info
 
-      - name: Install Kustomizations
-        run: |
-          for kustomization in *-kustomization.yaml; do
-            if [[ "$kustomization" =~ ^($IGNORE_REGEX)- ]]; then
-              echo "Skipping $kustomization"
-              echo
-            fi
-            echo "$kustomization"
-            cp -fv -- "$kustomization" kustomization.yaml
-            kustomize build --enable-helm | kubectl apply -f -
-            echo
-          done
+      - uses: ./.github/actions/kustomizations-install
 
       - name: Check Objects are Explicitly Namespaced
         run: |
