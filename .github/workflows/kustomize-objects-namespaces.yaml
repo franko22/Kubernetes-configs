@@ -13,7 +13,7 @@
 #
 
 ---
-name: Kustomize Objects Namespaces
+name: Kustomize Objects Namespaced
 
 on:
   push:
@@ -52,8 +52,8 @@ defaults:
     shell: bash -euxo pipefail {0}
 
 jobs:
-  kustomize-check-object-namespaces:
-    name: Kustomize Check Object Namespaces
+  kustomize-check-objects-namespaced:
+    name: Kustomize Check Objects Namespaced
     runs-on: ubuntu-latest
     steps:
       - name: Environment
@@ -83,7 +83,7 @@ jobs:
           tar zxvf /tmp/kustomize.tar.gz -C /usr/local/bin/
 
       - name: Install yq
-        run: apt-get install -y yq
+        run: sudo apt-get install -y yq
 
       - name: Kustomize Version
         run: kustomize version
@@ -112,7 +112,7 @@ jobs:
             echo
           done
 
-      - name: Check objects without Explicit Namespaces
+      - name: Check Objects are Explicitly Namespaced
         run: |
           for kustomization in *-kustomization.yaml; do
             if [[ "$kustomization" =~ ^($IGNORE_REGEX)- ]]; then
