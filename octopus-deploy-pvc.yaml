@@ -15,12 +15,10 @@
 #
 
 # ============================================================================ #
-#                         Octopus Deploy AKS Single PVC
+#                               Octopus Deploy PVC
 # ============================================================================ #
 
 # https://octopus.com/docs/installation/octopus-server-linux-container/octopus-in-kubernetes
-
-# Use a single volume instead of 3 separate volumes, this means less buckets and potentially less costs (should be trivial)
 
 ---
 kind: PersistentVolumeClaim
@@ -31,7 +29,6 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: azurefile
   resources:
     requests:
       storage: 4Gi

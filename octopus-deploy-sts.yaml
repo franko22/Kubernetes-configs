@@ -25,6 +25,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: octopus
+  namespace: octopus-deploy
   annotations:
     datree.skip/CONTAINERS_INCORRECT_PRIVILEGED_VALUE_TRUE: 'TODO: check if this really requires privilege'
 spec:
@@ -58,10 +59,10 @@ spec:
             claimName: octopus-storage-claim
       containers:
         - name: octopus
-          image: octopusdeploy/octopusdeploy:2021.3.8275
-          # TODO: check if this really needs to be privileged
-          securityContext:
-            privileged: true
+          image: octopusdeploy/octopusdeploy:2021.3
+          # XXX: needs to be privileged if doing Docker-in-Docker
+          #securityContext:
+          #  privileged: true
           ports:
             - containerPort: 8080
               name: web
@@ -75,9 +76,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: DB_CONNECTION_STRING
-              # TODO: check this env can be constructed from another env like this, otherwise move to secret
-              value: Server=mssql,1433;Database=Octopus;User Id=SA;Password=$(SA_PASSWORD)
             - name: ADMIN_USERNAME
               value: admin
             - name: ADMIN_PASSWORD
@@ -98,6 +96,9 @@ spec:
             #- name: MASTER_KEY
             #  # Replace this, as this value protects secrets in Octopus
             #  value: <MasterKey-goes-here>
+            # XXX: must come after the environment variable it is referencing ie. SA_PASSWORD
+            - name: DB_CONNECTION_STRING
+              value: Server=mssql,1433;Database=Octopus;User Id=SA;Password=$(SA_PASSWORD)
           # TODO: tune
           resources:
             requests:

@@ -20,11 +20,16 @@
 
 # https://octopus.com/docs/installation/octopus-server-linux-container/octopus-in-kubernetes
 
+# Use 3 separate volumes
+#
+# Requires changing the StatefulSet volume mounts
+
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: artifacts-claim
+  namespace: octopus-deploy
 spec:
   accessModes:
     - ReadWriteMany
@@ -37,6 +42,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: repository-claim
+  namespace: octopus-deploy
 spec:
   accessModes:
     - ReadWriteMany
@@ -49,6 +55,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: task-logs-claim
+  namespace: octopus-deploy
 spec:
   accessModes:
     - ReadWriteMany
