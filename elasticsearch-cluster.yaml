@@ -1,9 +1,8 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2022-08-18 14:53:29 +0100 (Thu, 18 Aug 2022)
+#  Date: 2022-08-18 14:55:44 +0100 (Thu, 18 Aug 2022)
 #
 #  vim:ts=2:sts=2:sw=2:et
-#  lint:k8s
 #
 #  https://github.com/HariSekhon/Kubernetes-configs
 #
@@ -15,18 +14,18 @@
 #
 
 # ============================================================================ #
-#             E l a s t i c s e a r c h   K u s t o m i z a t i o n
+#                     Elasticsearch Cluster for ECK operator
 # ============================================================================ #
 
-# https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-deploy-elasticsearch.html
-
 ---
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-#namespace: elasticsearch
-
-#bases:
-#  - ../elastic-cloud  # should contain elastic-cloud-*.yaml
-
-resources:
-  - elasticsearch-cluster.yaml
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: mycluster  # XXX: Edit
+spec:
+  version: 8.3.3   # XXX: Exit
+  nodeSets:
+    - name: default
+      count: 1     # XXX: Edit
+      config:
+        node.store.allow_mmap: false
