@@ -13,25 +13,21 @@
 #
 
 ---
-name: Kustomize Nova
+name: Nova
 
 on:
   push:
     branches:
       - master
     paths:
-      - '*.yaml'
-      - .github/workflows/kustomize-nova.yaml
-      - .github/actions/install-kustomize/action.yaml
-      - .github/actions/kustomizations-materizalize/action.yaml
+      - '*-kustomization.yaml'
+      - .github/workflows/nova.yaml
   pull_request:
     branches:
       - master
     paths:
-      - '*.yaml'
-      - .github/workflows/kustomize-nova.yaml
-      - .github/actions/install-kustomize/action.yaml
-      - .github/actions/kustomizations-materialize/action.yaml
+      - '*-kustomization.yaml'
+      - .github/workflows/nova.yaml
   workflow_dispatch:  # needs to be in default branch before you get the UI option to manually run though
     inputs:
       debug:
@@ -56,8 +52,8 @@ env:
   DEBUG: ${{ inputs.debug != 'false' || github.event.inputs.debug != 'false' || '' }}
 
 jobs:
-  kustomize-nova:
-    name: Kustomize nova
+  nova:
+    name: Nova
     runs-on: ubuntu-latest
     steps:
       - name: Environment
@@ -78,15 +74,26 @@ jobs:
       - name: Nova version
         run: nova version
 
+      - name: Install Helm
+        run: bash-tools/setup/install_helm.sh
+
+      - name: Helm version
+        run: helm version
+
+      - name: Install yq
+        run: bash-tools/setup/install_yq.sh
+
+      - name: yq version
+        run: yq --version
+
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
 
       - name: Cluster Info
         run: kubectl cluster-info
 
-      - uses: ./.github/actions/install-kustomize
-
-      - uses: ./.github/actions/kustomizations-install
+      - name: Install Helm Charts
+        run: bash-tools/kustomize_install_helm_charts.sh *-kustomization.yaml
 
       - name: Nova Find
         run: nova find
