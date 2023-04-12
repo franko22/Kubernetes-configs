@@ -25,7 +25,7 @@
 ---
 #image:
   #repository: kong
-  #tag: "3.2"
+  #tag: "3.2"  # XXX: must be compatible version with ingressController.tag below
   # Kong Enterprise
   # repository: kong/kong-gateway
   # tag: "3.2"
@@ -39,8 +39,10 @@ resources:
     cpu: 1
     memory: 2G
 
-# XXX: required for HPA
 ingressController:
+  #tag: "2.9"  # XXX: must match both Kong version above and Kubernetes cluster version:  https://docs.konghq.com/kubernetes-ingress-controller/latest/references/version-compatibility/
+  #
+  # XXX: required for HPA
   resources:
     limits:
       cpu: 100m
@@ -274,6 +276,7 @@ admin:
     path: /
     pathType: Prefix  # default: ImplementationSpecific
 
+# XXX: only materializes if enterprise.enabled = true
 portal:
   enabled: true
   type: ClusterIP  # default: NodePort
@@ -312,6 +315,7 @@ portal:
     path: /
     pathType: Prefix  # default: ImplementationSpecific
 
+# XXX: only materializes if enterprise.enabled = true
 portalapi:
   enabled: true
   type: ClusterIP  # default: NodePort
@@ -351,7 +355,7 @@ portalapi:
     pathType: Prefix  # default: ImplementationSpecific
 
 certificates:
-  enabled: false
+  enabled: true  # default: false - but we want real certificates from Cert Manager rather than self-signed for the tls components
 
   # Set either `issuer` or `clusterIssuer` to the name of the desired cert manager issuer
   # If left blank a built in self-signed issuer will be created and utilized
