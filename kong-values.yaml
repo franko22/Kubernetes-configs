@@ -135,6 +135,68 @@ proxy:
     parameters:
       - http2
 
+# Kong Admin API - usually recommended to disable, but useful for API devs like me
+admin:
+  enabled: true  # XXX: you should probably set this to false unless you really intend to use the API, which is mostly read-only in this deployment style
+  type: ClusterIP  # default: NodePort
+  loadBalancerClass:
+  # To specify annotations or labels for the admin service, add them to the respective
+  # "annotations" or "labels" dictionaries below.
+  annotations: {}
+  #  service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+  labels: {}
+
+  http:
+    # Enable plaintext HTTP listen for the admin API
+    # Disabling this and using a TLS listen only is recommended for most configuration
+    enabled: false
+    servicePort: 8001
+    containerPort: 8001
+    # Set a nodePort which is available if service type is NodePort
+    # nodePort: 32080
+    # Additional listen parameters, e.g. "reuseport", "backlog=16384"
+    parameters: []
+
+  tls:
+    enabled: true
+    servicePort: 8444
+    containerPort: 8444
+    # Set a target port for the TLS port in the admin API service, useful when using TLS
+    # termination on an ELB.
+    # overrideServiceTargetPort: 8000
+    # Set a nodePort which is available if service type is NodePort
+    # nodePort: 32443
+    # Additional listen parameters, e.g. "reuseport", "backlog=16384"
+    parameters:
+      - http2
+
+    # Specify the CA certificate to use for TLS verification of the Admin API client by:
+    # - secretName - the secret must contain a key named "tls.crt" with the PEM-encoded certificate.
+    # - caBundle (PEM-encoded certificate string).
+    # If both are set, caBundle takes precedence.
+    client:
+      caBundle: ""
+      secretName: ""
+
+  ingress:
+    enabled: true
+    ingressClassName: ingress-nginx
+    # tls: kong-admin.example.com-tls
+    hostname: kong-admin.DEV.DOMAIN.COM  # XXX: Edit
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: ingress-nginx
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      nginx.ingress.kubernetes.io/whitelist-source-range: |
+        10.0.0.0/8,
+        172.16.0.0/16,
+        192.168.0.0/16
+    path: /
+    pathType: Prefix  # default: ImplementationSpecific
+
 enterprise:
   enabled: false
   # Kong Enterprise license secret name
@@ -212,64 +274,10 @@ manager:
     hostname: kong.DEV.DOMAIN.COM  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
-      nginx.ingress.kubernetes.io/whitelist-source-range: |
-        10.0.0.0/8,
-        172.16.0.0/16,
-        192.168.0.0/16
-    path: /
-    pathType: Prefix  # default: ImplementationSpecific
-
-# Kong Admin API - usually recommended to disable, but useful for API devs like me
-admin:
-  enabled: true  # XXX: you should probably set this to false unless you really intend to use the API, which is mostly read-only in this deployment style
-  type: ClusterIP  # default: NodePort
-  loadBalancerClass:
-  # To specify annotations or labels for the admin service, add them to the respective
-  # "annotations" or "labels" dictionaries below.
-  annotations: {}
-  #  service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-  labels: {}
-
-  http:
-    # Enable plaintext HTTP listen for the admin API
-    # Disabling this and using a TLS listen only is recommended for most configuration
-    enabled: false
-    servicePort: 8001
-    containerPort: 8001
-    # Set a nodePort which is available if service type is NodePort
-    # nodePort: 32080
-    # Additional listen parameters, e.g. "reuseport", "backlog=16384"
-    parameters: []
-
-  tls:
-    enabled: true
-    servicePort: 8444
-    containerPort: 8444
-    # Set a target port for the TLS port in the admin API service, useful when using TLS
-    # termination on an ELB.
-    # overrideServiceTargetPort: 8000
-    # Set a nodePort which is available if service type is NodePort
-    # nodePort: 32443
-    # Additional listen parameters, e.g. "reuseport", "backlog=16384"
-    parameters:
-      - http2
-
-    # Specify the CA certificate to use for TLS verification of the Admin API client by:
-    # - secretName - the secret must contain a key named "tls.crt" with the PEM-encoded certificate.
-    # - caBundle (PEM-encoded certificate string).
-    # If both are set, caBundle takes precedence.
-    client:
-      caBundle: ""
-      secretName: ""
-
-  ingress:
-    enabled: true
-    ingressClassName: ingress-nginx
-    # tls: kong-admin.example.com-tls
-    hostname: kong-admin.DEV.DOMAIN.COM  # XXX: Edit
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: ingress-nginx
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/whitelist-source-range: |
         10.0.0.0/8,
         172.16.0.0/16,
@@ -309,6 +317,10 @@ portal:
     hostname: kong-portal.DEV.DOMAIN.COM  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/whitelist-source-range: |
         10.0.0.0/8,
         172.16.0.0/16,
@@ -348,6 +360,10 @@ portalapi:
     hostname: kong-portal-api.DEV.DOMAIN.COM  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/whitelist-source-range: |
         10.0.0.0/8,
         172.16.0.0/16,
@@ -360,15 +376,12 @@ certificates:
 
   # Set either `issuer` or `clusterIssuer` to the name of the desired cert manager issuer
   # If left blank a built in self-signed issuer will be created and utilized
-  issuer: letsencrypt
+  #issuer: letsencrypt
   clusterIssuer: letsencrypt
 
-  # Set proxy.enabled to true to issue default kong-proxy certificate with cert-manager
   proxy:
     enabled: true
-    # Set `issuer` or `clusterIssuer` to name of alternate cert-manager clusterIssuer to override default
-    # self-signed issuer.
-    issuer: letsencrypt
+    #issuer: letsencrypt
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
@@ -379,12 +392,9 @@ certificates:
     # - "*.apps.example"
     # - "*.kong.example"
 
-  # Set admin.enabled true to issue kong admin api and manager certificate with cert-manager
   admin:
     enabled: true
-    # Set `issuer` or `clusterIssuer` to name of alternate cert-manager clusterIssuer to override default
-    # self-signed issuer.
-    issuer: letsencrypt
+    #issuer: letsencrypt
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
@@ -393,12 +403,9 @@ certificates:
     dnsNames: []
     # - "manager.kong.example"
 
-  # Set portal.enabled to true to issue a developer portal certificate with cert-manager
   portal:
     enabled: true
-    # Set `issuer` or `clusterIssuer` to name of alternate cert-manager clusterIssuer to override default
-    # self-signed issuer.
-    issuer: letsencrypt
+    #issuer: letsencrypt
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
@@ -407,11 +414,10 @@ certificates:
     dnsNames: []
     # - "manager.kong.example"
 
-  # Set cluster.enabled true to issue kong hybrid mtls certificate with cert-manager
   cluster:
     enabled: true
     # Issuers used by the control and data plane releases must match for this certificate.
-    issuer: letsencrypt
+    #issuer: letsencrypt
     clusterIssuer: letsencrypt
     #commonName: kong-cluster.DEV.DOMAIN.COM  # XXX: Edit
     # dnsNames: []
