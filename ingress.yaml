@@ -44,7 +44,11 @@ metadata:
     #
     #   https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
     #
-    kubernetes.io/ingress.class: nginx  # deprecated, use ingressClassName under spec section for Kubernetes 1.18+
+    # Defaults are shown in the docs above and can be verified in the code here:
+    #
+    #   https://github.com/kubernetes/ingress-nginx/blob/main/internal/ingress/controller/config/config.go
+    #
+    #kubernetes.io/ingress.class: nginx  # deprecated, use ingressClassName under spec section for Kubernetes 1.18+
 
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # redirect even if the ingress doesn't have TLS
@@ -105,6 +109,8 @@ metadata:
     # for Traefik Ingress Controller
     #
     #kubernetes.io/ingress.class: traefik  # deprecated, use ingressClassName under spec section for Kubernetes 1.18+
+    #traefik.ingress.kubernetes.io/router.entrypoints: web
+    #traefik.ingress.kubernetes.io/router.middlewares: default-redirectscheme@kubernetescrd
 
     # ================================
     # for Kong Ingress Controller
@@ -125,9 +131,12 @@ metadata:
     #konghq.com/plugins: ratelimit-by-ip, key-auth, oidc, admin-acl  # choose either simple key-auth or oidc
 
 spec:
-  # replaces kubernetes.io/ingress.class annotation in Kubernetes 1.18+ - https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
-  # pick one:
-  #ingressClassName: nginx
+  # ingressClassName replaces kubernetes.io/ingress.class annotation in Kubernetes 1.18+
+  #
+  #   https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+  #
+  # XXX: pick one:
+  ingressClassName: nginx
   #ingressClassName: traefik
   #ingressClassName: kong
   tls:

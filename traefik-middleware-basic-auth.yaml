@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2022-08-18 17:54:32 +0100 (Thu, 18 Aug 2022)
+#  Date: 2023-04-13 01:47:40 +0100 (Thu, 13 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,19 +15,14 @@
 #
 
 # ============================================================================ #
-#                                  Chart Values
+#                      T r a e f i k   M i d d l e w a r e
 # ============================================================================ #
 
-# helm repo add elastic https://helm.elastic.co
-#
-# helm show values elastic/eck-operator >> elastic-cloud-values.yaml
-
 ---
-#replicaCount: 1
-#resources:
-#  requests:
-#    cpu: 100m
-#    memory: 150Mi
-#  limits:
-#    cpu: 1
-#    memory: 1Gi
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: test-auth  # XXX: Edit
+spec:
+  basicAuth:
+    secret: admin-secret  # XXX: Edit
