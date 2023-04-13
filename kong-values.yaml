@@ -137,7 +137,7 @@ proxy:
 
 # Kong Admin API - usually recommended to disable, but useful for API devs like me
 admin:
-  enabled: true  # XXX: you should probably set this to false unless you really intend to use the API, which is mostly read-only in this deployment style
+  enabled: false  # XXX: enable if you want to use the Admin API, which is mostly read-only in the Kubernetes-native KIC deployment style
   type: ClusterIP  # default: NodePort
   loadBalancerClass:
   # To specify annotations or labels for the admin service, add them to the respective
@@ -181,11 +181,11 @@ admin:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostname: kong-admin.DEV.DOMAIN.COM  # XXX: Edit
+    hostname: kong-admin.domain.com  # XXX: Edit
     tls: kong-admin-tls
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: nginx
+      #kubernetes.io/ingress.class: nginx  # deprecated, and cannot also be set if ingressClassName is set
       ingress.kubernetes.io/ssl-redirect: "true"
       ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -271,7 +271,7 @@ manager:
     enabled: true
     ingressClassName: nginx
     # tls: kong-manager.example.com-tls
-    hostname: kong.DEV.DOMAIN.COM  # XXX: Edit
+    hostname: kong.domain.com  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
       ingress.kubernetes.io/ssl-redirect: "true"
@@ -314,7 +314,7 @@ portal:
     enabled: true
     ingressClassName: nginx
     # tls: kong-manager.example.com-tls
-    hostname: kong-portal.DEV.DOMAIN.COM  # XXX: Edit
+    hostname: kong-portal.domain.com  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
       ingress.kubernetes.io/ssl-redirect: "true"
@@ -357,7 +357,7 @@ portalapi:
     enabled: true
     ingressClassName: nginx
     # tls: kong-manager.example.com-tls
-    hostname: kong-portal-api.DEV.DOMAIN.COM  # XXX: Edit
+    hostname: kong-portal-api.domain.com  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
       ingress.kubernetes.io/ssl-redirect: "true"
@@ -385,7 +385,7 @@ certificates:
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
-    commonName: kong.DEV.DOMAIN.COM  # XXX: Edit
+    commonName: kong.domain.com  # XXX: Edit
     # Remove the "[]" and uncomment/change the examples to add SANs
     dnsNames: []
     # - "app.example"
@@ -398,7 +398,7 @@ certificates:
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
-    commonName: kong-admin.DEV.DOMAIN.COM  # XXX: Edit
+    commonName: kong-admin.domain.com  # XXX: Edit
     # Remove the "[]" and uncomment/change the examples to add SANs
     dnsNames: []
     # - "manager.kong.example"
@@ -409,7 +409,7 @@ certificates:
     clusterIssuer: letsencrypt
     # Use commonName and dnsNames to set the common name and dns alt names which this
     # certificate is valid for. Wildcard records are supported by the included self-signed issuer.
-    commonName: kong-portal.DEV.DOMAIN.COM  # XXX: Edit
+    commonName: kong-portal.domain.com  # XXX: Edit
     # Remove the "{}" and uncomment/change the examples to add SANs
     dnsNames: []
     # - "manager.kong.example"
@@ -419,5 +419,5 @@ certificates:
     # Issuers used by the control and data plane releases must match for this certificate.
     #issuer: letsencrypt
     clusterIssuer: letsencrypt
-    #commonName: kong-cluster.DEV.DOMAIN.COM  # XXX: Edit
+    #commonName: kong-cluster.domain.com  # XXX: Edit
     # dnsNames: []
