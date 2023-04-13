@@ -74,13 +74,13 @@ See [kustomization.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/m
 - Pod Anti-Affinity - stable vs preemptible, HA across AZs, see [deployment.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/deployment.yaml)
 - Ingress Controllers - `ingress-nginx-*.yaml`, `kong-*.yaml` or `traefik-*.yaml`
 - Ingress SSL - [Cert Manager](https://cert-manager.io/) `cert-manager-*.yaml` for [Automatic Certificate Management](https://en.wikipedia.org/wiki/Automatic_Certificate_Management_Environment) using the popular free Let's Encrypt certificate authority
-- App Lifecycle Management - [ArgoCD](https://argoproj.github.io/cd/) - `argocd*.yaml`
+- App Lifecycle Management - [ArgoCD](https://argoproj.github.io/cd/) - `argocd-*.yaml`
 - App Ingresses - [ingress.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/ingress.yaml), `*-ingress.yaml`
 - App Resources - see resources section in [deployment.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/deployment.yaml)
-- App Right-sizing - [Goldilocks](https://www.fairwinds.com/goldilocks) - `goldilocks*.yaml` to generate VPAs and resource recommendations
+- App Right-sizing - [Goldilocks](https://www.fairwinds.com/goldilocks) - `goldilocks-*.yaml` to generate VPAs and resource recommendations
 - Network Policies - [network-policy.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/network-policy.yaml)
 - Pod Security Policies - [pod-security-policy.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/pod-security-policy.yaml)
-- Governance, Security & Best Practices - [Polaris](https://www.fairwinds.com/polaris) - `polaris*.yaml` for recommendations
+- Governance, Security & Best Practices - [Polaris](https://www.fairwinds.com/polaris) - `polaris-*.yaml` for recommendations
 - Find Deprecated API objects to replace - [Pluto](https://pluto.docs.fairwinds.com/) - see [pluto_detect_kustomize_materialize.sh](https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/pluto_detect_kustomize_materialize.sh) and [pluto_detect_kubectl_dump_objects.sh](https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/pluto_detect_kubectl_dump_objects.sh) in the [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools) repo
 
 ## Further Documention
