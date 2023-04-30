@@ -87,7 +87,7 @@ podDisruptionBudget:
 
 # Use ingressClass. Ignored if Traefik version < 2.3 / kubernetes < 1.18.x
 ingressClass:
-  enabled: false  # ERROR: You must have at least networking.k8s.io/v1beta1 to use ingressClass
+  enabled: true  # set to false if get 'ERROR: You must have at least networking.k8s.io/v1beta1 to use ingressClass'
   isDefaultClass: false
 
 # Activate Pilot integration
@@ -182,6 +182,7 @@ volumes: []
 # - name: public-cert
 #   mountPath: "/certs"
 #   type: secret
+# XXX: for nested healthchecks traefik-healthchecks-configmap.yaml
 # - name: '{{ printf "%s-configs" .Release.Name }}'
 #   mountPath: "/config"
 #   type: configMap
@@ -258,14 +259,17 @@ globalArguments:
   - "--global.checknewversion"
   - "--global.sendanonymoususage"
 
-#
-# Configure Traefik static configuration
 # Additional arguments to be passed at Traefik's binary
-# All available options available on https://docs.traefik.io/reference/static-configuration/cli/
+#
+#   https://docs.traefik.io/reference/static-configuration/cli/
+#
 ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
+#
 additionalArguments: []
 #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
 #  - "--log.level=DEBUG"
+  #
+  # Shouldn't need this if you've got Cert Manager installed
   #
   #- "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
   #- "--certificatesresolvers.letsencrypt.acme.email=<FIXME>"
@@ -398,7 +402,12 @@ service:
   enabled: true
   type: LoadBalancer
   # Additional annotations applied to both TCP and UDP services (e.g. for cloud provider specific config)
-  annotations: {}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"  # XXX: only available via VPN to internal networks
   # Additional annotations for TCP service only
   annotationsTCP: {}
   # Additional annotations for UDP service only
@@ -411,9 +420,10 @@ service:
     # externalTrafficPolicy: Cluster
     # loadBalancerIP: "1.2.3.4"
     # clusterIP: "2.3.4.5"
-  loadBalancerSourceRanges: []
-    # - 192.168.0.1/32
-    # - 172.16.0.0/16
+  loadBalancerSourceRanges:
+    - 192.168.0.0/16
+    - 172.16.0.0/12
+    - 10.0.0.0/8
   externalIPs: []
     # - 1.2.3.4
   # One of SingleStack, PreferDualStack, or RequireDualStack.

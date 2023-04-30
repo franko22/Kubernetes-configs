@@ -1,9 +1,8 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2021-05-28 18:16:27 +0100 (Fri, 28 May 2021)
+#  Date: 2023-04-29 03:04:49 +0100 (Sat, 29 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
-#  lint: k8s
 #
 #  https://github.com/HariSekhon/Kubernetes-configs
 #
@@ -15,24 +14,28 @@
 #
 
 # ============================================================================ #
-#                F l u x C D v 2   G i t   /   H e l m   r e p o
+#                   F l u x C D v 2   H e l m   R e l e a s e
 # ============================================================================ #
 
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-#kind: HelmRepository
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
 metadata:
-  # XXX: Edit
-  name: NAME
-  namespace: flux-system
+  name: traefik
 spec:
-  interval: 1m
-  ref:
-    # XXX: Edit
-    branch: master
-  # XXX: Edit
-  # Git repository
-  url: https://github.com/HariSekhon/Kubernetes-configs
-  # Helm repository
-  # url: https://helm.traefik.io/traefik
+  chart:
+    spec:
+      chart: traefik
+      version: ">=23.0.1"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  valuesFrom:
+		- kind: ConfigMap
+			name: traefik-values
+			valuesKey: traefik-values.yaml
+			optional: true
+  interval: 1h
+  releaseName: traefik
+  targetNamespace: traefik

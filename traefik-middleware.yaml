@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2021-05-28 18:16:27 +0100 (Fri, 28 May 2021)
+#  Date: 2023-04-13 01:47:40 +0100 (Thu, 13 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,24 +15,17 @@
 #
 
 # ============================================================================ #
-#                F l u x C D v 2   G i t   /   H e l m   r e p o
+#                      T r a e f i k   M i d d l e w a r e
 # ============================================================================ #
 
+# https://doc.traefik.io/traefik/middlewares/http/overview/
+
+# https://doc.traefik.io/traefik/middlewares/tcp/overview/
+
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-#kind: HelmRepository
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
 metadata:
-  # XXX: Edit
-  name: NAME
-  namespace: flux-system
+  name: NAME # XXX: Edit
 spec:
-  interval: 1m
-  ref:
-    # XXX: Edit
-    branch: master
-  # XXX: Edit
-  # Git repository
-  url: https://github.com/HariSekhon/Kubernetes-configs
-  # Helm repository
-  # url: https://helm.traefik.io/traefik
+  ...  # XXX: Edit

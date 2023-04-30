@@ -28,6 +28,11 @@ namespace: traefik  # XXX: 4 objects without explicit namespace as shown by kust
 
 resources:
   - traefik-namespace.yaml
+  - traefik-dashboard-service.yaml
+  - traefik-dashboard-basic-auth.yaml
+  - traefik-dashboard-ingress.yaml  # or use IngressRoute
+  - traefik-dashboard-api-ingress.yaml
+  - traefik-dashboard-add-prefix.yaml
   # XXX: for quickly testing Traefik
   #- whoami.yaml
 
