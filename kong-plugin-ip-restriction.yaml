@@ -15,31 +15,26 @@
 #
 
 # ============================================================================ #
-#        K o n g   P l u g i n   -   R a t e L i m i t   A d v a n c e d
+#              K o n g   I P   R e s t r i c t i o n   P l u g i n
 # ============================================================================ #
 
 ---
 apiVersion: configuration.konghq.com/v1
 kind: KongPlugin
-plugin: rate-limiting
+plugin: ip-restriction
 metadata:
-  name: global-rate-limit-adv
+  name: ip-restriction-private-only
   namespace: kong
   annotations:
     kubernetes.io/ingress.class: kong
-  labels:
-    global: "true"
+  # must use KongClusterPlugin instead
+  #labels:
+  #  global: "true"
 config:
-  namespace: APP
-  limit:
-    - 10
-    - 20
-  window_size:
-    - 60
-    - 90
-  window_type: sliding
-  sync_rate: 0
-  strategy: redis
-  redis:
-    host: redis-master.kong.svc.cluster.local
-    port: 6379
+  allow:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+  #deny:
+  #  - 127.0.0.1
+  message: Your IP address is not allowed, by order of the Peaky Blinders

@@ -108,6 +108,50 @@ securityContext: {}
 containerSecurityContext:
   readOnlyRootFilesystem: true
 
+# ============================================================================ #
+# Environment variables applies to all deployments, both controller and proxy
+#
+# chart takes all entries defined under `.env` and transforms them into into `KONG_*` environment variables for Kong containers
+#
+# Their names here should match the names used in:
+#
+#     https://github.com/Kong/kong/blob/master/kong.conf.default
+#
+# See also:
+#
+#     https://docs.konghq.com/latest/configuration
+#
+#env:
+#  some_var:
+#    value: some_value
+#    #valueFrom:
+#    #  secretKeyRef:
+#    #    name: some-secret
+#    #    key: some-key-in-secret
+
+#env:
+#  trusted_ips:
+#    value: 0.0.0.0/0
+#  real_ip_recursive:
+#    value: "on"
+
+# ========================================================
+# Environments variables that doesn't require KONG_ prefix eg. for plugins access environment specific credentials or tokens
+#
+# Note that these environment variables will only apply to the proxy and init container. The ingress-controller container has its own customEnv section
+#
+# customEnv:
+#   real_ip_header:
+#     value: X-Forwarded-For
+#   api_token:
+#     valueFrom:
+#       secretKeyRef:
+#         key: token
+#         name: api_key
+#   client_name: testClient
+
+# ============================================================================ #
+
 proxy:
   enabled: true
   type: LoadBalancer
@@ -142,8 +186,10 @@ admin:
   loadBalancerClass:
   # To specify annotations or labels for the admin service, add them to the respective
   # "annotations" or "labels" dictionaries below.
-  annotations: {}
-  #  service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+  annotations:
+    # XXX: this goes onto the service object to prevent error '400 Bad Request  The plain HTTP request was sent to HTTPS port'
+    konghq.com/protocol: https
+    #service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
   labels: {}
 
   http:
@@ -181,19 +227,14 @@ admin:
   ingress:
     enabled: true
     #ingressClassName: nginx
-    hostname: kong-admin.domain.com  # XXX: Edit
-    tls: kong-admin-tls
+    hostname: kong-api.domain.com  # XXX: Edit
+    tls: kong-api-tls
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: nginx  # deprecated, and cannot also be set if ingressClassName is set
-      ingress.kubernetes.io/ssl-redirect: "true"
       ingress.kubernetes.io/force-ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/backend-protocol: HTTPS  # needs this because chart generates ingress sending to backend 8444 and client gets 400 Bad Request "The plain HTTP request was sent to HTTPS port" otherwise
-      nginx.ingress.kubernetes.io/whitelist-source-range: |
-        10.0.0.0/8,
-        172.16.0.0/16,
-        192.168.0.0/16
+      kubernetes.io/ingress.class: kong  # deprecated, and cannot also be set if ingressClassName is set
+      konghq.com/protocols: https
+      konghq.com/plugins: ip-restriction-private-only
     path: /
     pathType: Prefix  # default: ImplementationSpecific
 
@@ -274,15 +315,10 @@ manager:
     hostname: kong.domain.com  # XXX: Edit
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: nginx  # deprecated, and cannot also be set if ingressClassName is set
-      ingress.kubernetes.io/ssl-redirect: "true"
       ingress.kubernetes.io/force-ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-      nginx.ingress.kubernetes.io/whitelist-source-range: |
-        10.0.0.0/8,
-        172.16.0.0/16,
-        192.168.0.0/16
+      kubernetes.io/ingress.class: kong  # deprecated, and cannot also be set if ingressClassName is set
+      konghq.com/protocols: https
+      konghq.com/plugins: ip-restriction-private-only
     path: /
     pathType: Prefix  # default: ImplementationSpecific
 
