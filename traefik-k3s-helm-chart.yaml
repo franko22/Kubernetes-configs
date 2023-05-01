@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2023-04-29 23:57:49 +0100 (Sat, 29 Apr 2023)
+#  Date: 2023-04-30 20:11:36 +0100 (Sun, 30 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #
@@ -14,7 +14,7 @@
 #
 
 # ============================================================================ #
-#               H e l m   C h a r t   C o n f i g   f o r   K 3 s
+#                      H e l m   C h a r t   f o r   K 3 s
 # ============================================================================ #
 
 # This is CRD for deploying Helm charts using the K3s Helm Controller:
@@ -23,26 +23,54 @@
 #
 #   https://github.com/k3s-io/helm-controller/
 
-# cp to /var/lib/rancher/k3s/server/manifests/some-config.yaml
+# cp to /var/lib/rancher/k3s/server/manifests/some-helm.yaml
 
 ---
 apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
+kind: HelmChart
 metadata:
-  name: NAME  # XXX: Edit eg. traefik
+  name: traefik
   namespace: helm-charts  # deploy to a different namespace than the app for separation
 spec:
+  repo: https://helm.traefik.io/traefik
+  chart: traefik
+  version: 10.9.0
+  targetNamespace: traefik
+  set:
+    global.systemDefaultRegistry: ""
+	# or cp helm-chart-config.yaml /var/lib/rancher/k3s/server/manifests/
   valuesContent: |-
+    experimental:
+      http3:
+        enabled: true
+      plugins:
+        enabled: true
+    rollingUpdate:
+      maxUnavailable: 0
     rbac:
       enabled: true
     ports:
       websecure:
         tls:
           enabled: true
+        http3: true
     podAnnotations:
       prometheus.io/port: "8082"
       prometheus.io/scrape: "true"
     providers:
+      kubernetesCRD:
+        allowCrossNamespace: true
+        allowExternalNameServices: true
       kubernetesIngress:
         publishedService:
           enabled: true
+    priorityClassName: "system-cluster-critical"
+    tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"'

@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2023-04-13 01:47:40 +0100 (Thu, 13 Apr 2023)
+#  Date: 2023-04-30 18:17:49 +0100 (Sun, 30 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,16 +15,22 @@
 #
 
 # ============================================================================ #
-#            T r a e f i k   D a s h b o a r d   B a s i c   A u t h
+#                  T r a e f i k   D a s h b o a r d   C e r t
 # ============================================================================ #
 
+# Needed for Traefik Ingressroutes because Cert Manager won't automatically generate the certs for them
+
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
+apiVersion: cert-manager.io/v1
+kind: Certificate
 metadata:
-  name: dashboard-basic-auth
+  name: traefik-dashboard
+  namespace: traefik
 spec:
-  basicAuth:
-    # htpasswd -nBb someuser somepass > dashboard.htpasswd
-    # kubectl create secret generic -n traefik dashboard-users --from-file=dashboard.htpasswd
-    secret: dashboard-users
+  secretName: traefik-dashboard-tls
+  dnsNames:
+    - traefik.DOMAIN.COM  # XXX: Edit
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt

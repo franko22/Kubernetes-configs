@@ -30,9 +30,18 @@ resources:
   - traefik-namespace.yaml
   - traefik-dashboard-service.yaml
   - traefik-dashboard-basic-auth.yaml
-  - traefik-dashboard-ingress.yaml  # or use IngressRoute
-  - traefik-dashboard-api-ingress.yaml
   - traefik-dashboard-add-prefix.yaml
+  - traefik-middleware-redirect-https.yaml
+  # =======
+  # either:
+  - traefik-dashboard-ingress.yaml
+  - traefik-dashboard-api-ingress.yaml
+  # =======
+  # or use more advanced ingressroute and cert-manager generated cert due to lack of integration
+  - traefik-dashboard-cert.yaml
+  - traefik-dashboard-ingressroute.yaml
+  - traefik-dashboard-ingressroute-http-redirect.yaml
+  # =======
   # XXX: for quickly testing Traefik
   #- whoami.yaml
 

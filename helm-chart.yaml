@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2023-04-29 23:57:49 +0100 (Sat, 29 Apr 2023)
+#  Date: 2023-04-30 20:11:36 +0100 (Sun, 30 Apr 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #
@@ -14,7 +14,7 @@
 #
 
 # ============================================================================ #
-#               H e l m   C h a r t   C o n f i g   f o r   K 3 s
+#                      H e l m   C h a r t   f o r   K 3 s
 # ============================================================================ #
 
 # This is CRD for deploying Helm charts using the K3s Helm Controller:
@@ -23,26 +23,23 @@
 #
 #   https://github.com/k3s-io/helm-controller/
 
-# cp to /var/lib/rancher/k3s/server/manifests/some-config.yaml
+# cp to /var/lib/rancher/k3s/server/manifests/some-helm.yaml
 
+# https://docs.k3s.io/helm#helmchart-field-definitions
 ---
 apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
+kind: HelmChart
 metadata:
-  name: NAME  # XXX: Edit eg. traefik
+  name: NAME  # XXX: Edit
   namespace: helm-charts  # deploy to a different namespace than the app for separation
 spec:
+  repo: REPO  # XXX: Edit
+  chart: CHART_NAME  # XXX: Edit
+  version: VERSION  # XXX: Edit
+  targetNamespace: NAMESPACE  # XXX: Edit
+  set:
+    global.systemDefaultRegistry: ""
+	# XXX: Edit
+	# or cp helm-chart-config.yaml /var/lib/rancher/k3s/server/manifests/
   valuesContent: |-
-    rbac:
-      enabled: true
-    ports:
-      websecure:
-        tls:
-          enabled: true
-    podAnnotations:
-      prometheus.io/port: "8082"
-      prometheus.io/scrape: "true"
-    providers:
-      kubernetesIngress:
-        publishedService:
-          enabled: true
+    key: value # ... yaml away ...
