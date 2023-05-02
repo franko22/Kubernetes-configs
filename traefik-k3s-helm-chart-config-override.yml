@@ -14,33 +14,34 @@
 #
 
 # ============================================================================ #
-#                      H e l m   C h a r t   f o r   K 3 s
+#                Traefik - Customize bundled K3s Traefik install
 # ============================================================================ #
 
-# Deploys Helm charts using the K3s Helm Controller:
-#
+# Override the settings of the bundled K3s Traefik installation
+
+# https://docs.k3s.io/helm#customizing-packaged-components-with-helmchartconfig
+
 #   https://docs.k3s.io/helm
 #
 #   https://github.com/k3s-io/helm-controller/
 
-# cp to /var/lib/rancher/k3s/server/manifests/some-helm.yaml
+# cp to /var/lib/rancher/k3s/server/manifests/traefil-config.yaml
 
-# https://docs.k3s.io/helm#helmchart-field-definitions
 ---
 apiVersion: helm.cattle.io/v1
-kind: HelmChart
+kind: HelmChartConfig
 metadata:
-  name: NAME  # XXX: Edit
-  namespace: helm-charts  # deploy to a different namespace than the app for separation
+  name: traefik
+  namespace: kube-system
 spec:
-  repo: REPO  # XXX: Edit
-  chart: CHART_NAME  # XXX: Edit
-  version: VERSION  # XXX: Edit
-  targetNamespace: NAMESPACE  # XXX: Edit
-  # set takes precedence over valuesContent and HelmChartConfig
-  set:
-    global.systemDefaultRegistry: ""
-  # XXX: Edit
-  # or cp helm-chart-config.yaml /var/lib/rancher/k3s/server/manifests/
   valuesContent: |-
-    key: value # ... yaml away ...
+    image:
+      name: traefik
+      tag: v2.8.5
+    forwardedHeaders:
+      enabled: true
+      trustedIPs:
+        - 10.0.0.0/8
+    ssl:
+      enabled: true
+      permanentRedirect: false
