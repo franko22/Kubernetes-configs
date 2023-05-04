@@ -47,6 +47,7 @@ spec:
     path: k8s/argocd/projects  # relative to root of git repo so no leading slash
   destination:
     server: https://kubernetes.default.svc
+    #name: in-cluster
     namespace: argocd
   syncPolicy:
     automated:

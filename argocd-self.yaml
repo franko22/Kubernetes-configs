@@ -36,6 +36,7 @@ spec:
     path: dir/path/to/k8s/manifests
   destination:
     server: https://kubernetes.default.svc  # in-cluster URL
+    #name: in-cluster
     namespace: argocd  # should be same as namespace above
   syncPolicy:
     automated:
