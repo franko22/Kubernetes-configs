@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2021-11-23 11:42:08 +0000 (Tue, 23 Nov 2021)
+#  Date: 2023-05-04 23:49:22 +0100 (Thu, 04 May 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,10 +15,10 @@
 #
 
 # ============================================================================ #
-#            A r g o C D   R e d i s   R e s o u r c e s   P a t c h
+#                ArgoCD Notifications Controller Resources Patch
 # ============================================================================ #
 
-# run: kubectl patch deploy argocd-redis-ha-haproxy -n argocd --type json --patch "$(cat argocd-resources.argocd-redis-ha-haproxy.jsonpatch.yaml)"
+# run: kubectl patch deploy argocd-notifications-controller -n argocd --type json --patch "$(cat argocd-resources.argocd-notifications-controller.jsonpatch.yaml)"
 
 ---
 - op: add
@@ -26,7 +26,7 @@
   value:
     requests:
       cpu: 100m
-      memory: 500Mi
+      memory: 100Mi
     limits:
-      cpu: 100m
+      cpu: 500m
       memory: 500Mi

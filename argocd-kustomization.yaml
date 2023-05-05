@@ -105,9 +105,21 @@ patches:
       kind: StatefulSet
       group: apps
       version: v1
+  - path: argocd-resources.argocd-applicationset-controller.jsonpatch.yaml
+    target:
+      name: argocd-applicationset-controller
+      kind: Deployment
+      group: apps
+      version: v1
   - path: argocd-resources.argocd-dex-server.jsonpatch.yaml
     target:
       name: argocd-dex-server
+      kind: Deployment
+      group: apps
+      version: v1
+  - path: argocd-resources.argocd-notifications-controller.jsonpatch.yaml
+    target:
+      name: argocd-notifications-controller
       kind: Deployment
       group: apps
       version: v1
@@ -123,6 +135,12 @@ patches:
     target:
       name: argocd-redis-ha-haproxy
       kind: Deployment
+      group: apps
+      version: v1
+  - path: argocd-resources.argocd-redis-ha-server.jsonpatch.yaml
+    target:
+      name: argocd-redis-ha-server
+      kind: StatefulSet
       group: apps
       version: v1
   - path: argocd-resources.argocd-repo-server.jsonpatch.yaml
