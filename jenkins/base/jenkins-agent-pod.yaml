@@ -110,6 +110,17 @@ spec:
           cpu: "1"
           memory: 1Gi
     # ==================================================
+    # XXX: needed for Docker builds, trivy or grype container scanning which docker pulls etc.
+    - name: docker
+      image: docker:23.0.6-dind-rootless
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+    # ==================================================
     # https://hub.docker.com/r/stedolan/jq
     - name: jq
       image: stedolan/jq
@@ -262,14 +273,37 @@ spec:
       imagePullPolicy: Always
       command:
         - cat
+      env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375  # XXX: needs the docker dind container near the top
       tty: true
       resources:
         requests:
-          cpu: 50m
-          memory: 50Mi
+          cpu: 300m
+          memory: 300Mi  # Trivy kept getting killed without more resources
         limits:
-          cpu: 500m
-          memory: 200Mi
+          cpu: '1'
+          memory: 1Gi
+    # ==================================================
+    # https://hub.docker.com/r/anchore/grype
+    - name: grype
+      #image: anchore/grype:v0.61.1
+      image: anchore/grype:latest
+      imagePullPolicy: Always
+      command:
+        # XXX: doesn't work at this time due to having no shell or busybox: https://github.com/anchore/grype/issues/1287
+        - cat
+      env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375  # XXX: needs the docker dind container near the top
+      tty: true
+      resources:
+        requests:
+          cpu: 300m
+          memory: 300Mi
+        limits:
+          cpu: '1'
+          memory: 1Gi
     # ==================================================
     # https://hub.docker.com/r/bridgecrew/checkov
     - name: checkov
