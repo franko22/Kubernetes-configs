@@ -92,11 +92,11 @@ spec:
       tty: true
       resources:
         requests:
-          cpu: 300m  # actually takes 800m but overcontend rather than spawning too many nodes for bursty workload
-          memory: 300Mi # uses around 250Mi
+          cpu: "1"     # takes around 800m
+          memory: 2Gi  # GCloud SDK requires 300Mi, but Trivy requires 1Gi and Grype requires 2Gi to avoid OOM Killer
         limits:
           cpu: "1"
-          memory: 1Gi
+          memory: 2Gi
     # ==================================================
     # https://hub.docker.com/r/amazon/aws-cli
     - name: aws-cli
@@ -110,18 +110,18 @@ spec:
       tty: true
       resources:
         requests:
-          cpu: 300m
-          memory: 300Mi
+          cpu: "1"
+          memory: 2Gi  # Trivy requires 1Gi and Grype requires 2Gi to avoid OOM Killer
         limits:
           cpu: "1"
-          memory: 1Gi
+          memory: 2Gi
     # ==================================================
     # XXX: needed for Docker builds, trivy or grype container scanning which docker pulls etc.
     - name: docker
       image: docker:23.0.6-dind-rootless
       resources:
         requests:
-          cpu: 200m
+          cpu: 500m
           memory: 512Mi
         limits:
           cpu: 500m
