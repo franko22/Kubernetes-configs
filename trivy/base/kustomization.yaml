@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2022-08-18 14:53:29 +0100 (Thu, 18 Aug 2022)
+#  Date: 2023-05-12 15:43:05 +0100 (Fri, 12 May 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,17 +15,23 @@
 #
 
 # ============================================================================ #
-#             E l a s t i c s e a r c h   K u s t o m i z a t i o n
+#                     T r i v y   K u s t o m i z a t i o n
 # ============================================================================ #
-
-# https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-deploy-elasticsearch.html
 
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: elasticsearch
+
+namespace: trivy  # 4 objects missing namespace otherwise
 
 resources:
-  #- ../elastic-cloud  # should contain elastic-cloud-*.yaml
   - namespace.yaml
-  - elasticsearch-cluster.yaml
+
+helmCharts:
+  - name: trivy
+    repo: https://aquasecurity.github.io/helm-charts/
+    version: 0.7.0
+    releaseName: trivy
+    namespace: trivy
+    includeCRDs: true
+    valuesFile: values.yaml

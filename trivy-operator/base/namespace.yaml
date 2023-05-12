@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2023-04-14 21:46:55 +0100 (Fri, 14 Apr 2023)
+#  Date: 2023-05-12 15:44:27 +0100 (Fri, 12 May 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -16,24 +16,13 @@
 #
 
 # ============================================================================ #
-#                   K y v e r n o   K u s t o m i z a t i o n
+#                T r i v y   O p e r a t o r   N a m e s p a c e
 # ============================================================================ #
 
-# https://artifacthub.io/packages/helm/kyverno/kyverno
-
 ---
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: kyverno  # 1 object (pod) caught unnamespaced
-
-resources:
-  - namespace.yaml
-
-helmCharts:
-  - name: kyverno
-    repo: https://kyverno.github.io/kyverno/
-    version: 2.7.2
-    releaseName: kyverno
-    namespace: kyverno
-    includeCRDs: true
-    valuesFile: values.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trivy-operator
+  labels:
+    goldilocks.fairwinds.com/enabled: "true"
