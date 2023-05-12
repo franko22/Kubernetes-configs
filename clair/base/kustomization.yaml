@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: [% DATE  # 2021-12-17 16:22:51 +0000 (Fri, 17 Dec 2021) %]
+#  Date: 2023-05-12 04:13:43 +0100 (Fri, 12 May 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,11 +15,23 @@
 #
 
 # ============================================================================ #
-#                            [% NAME %] Chart Values
+#                     C l a i r   K u s t o m i z a t i o n
 # ============================================================================ #
 
-# helm repo add [% NAME %] <url>
-#
-# helm show values [% NAME %]/[% NAME %] >> [% NAME %]-values.yaml
-
 ---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+#namespace: clair
+
+resources:
+  - clair-namespace.yaml
+
+helmCharts:
+  - name: clair
+    repo: https://wiremind.github.io/wiremind-helm-charts
+    version: 0.2.9
+    releaseName: clair
+    namespace: clair
+    includeCRDs: true
+    valuesFile: clair-values.yaml
