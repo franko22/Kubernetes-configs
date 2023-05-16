@@ -18,6 +18,8 @@
 #                      C l a i r   C h a r t   V a l u e s
 # ============================================================================ #
 
+# XXX: OBSOLETE - not using dated wiremind helm chart any more
+
 # helm repo add wiremind https://wiremind.github.io/wiremind-helm-charts
 #
 # helm show values wiremind/clair >> clair-values.yaml
@@ -26,9 +28,11 @@
 replicaCount: 1
 logLevel: debug
 insecureTls: false
-#image:
+# XXX: this chart is so out of date, override the tag to a current release
+image:
 #  repository: quay.io/coreos/clair
 #  tag: v2.1.6
+  tag: v4.3.6
 #  pullPolicy: IfNotPresent
 service:
   name: clair
