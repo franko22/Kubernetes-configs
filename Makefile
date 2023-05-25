@@ -70,6 +70,49 @@ datree-kustomize:
 wc:
 	find . -type f -name '*.yaml' -o -type f -name '*.json' | xargs wc -l
 
+envrc:
+	@echo "Check each .envrc NAMESPACE matches the namespace in the base namespace.yaml or kustomization.yaml"
+	@for base in */base; do \
+		app="$${base%/base}"; \
+		overlay="$$app/overlay"; \
+		if [ "$$base" = fluxcd/base ]; then \
+			continue; \
+		fi; \
+		BASE_NAMESPACE="$$(grep "NAMESPACE="  "$$base/.envrc"    | sed 's/.*=// ; s/"//g' | sed "s/'//g")"; \
+		if [ -d "$$overlay" ]; then \
+			OVERLAY_NAMESPACE="$$(grep "NAMESPACE=" "$$overlay/.envrc" | sed 's/.*=// ; s/"//g' | sed "s/'//g")"; \
+		fi; \
+		namespace="$$( \
+		    if [ -f "$$base/namespace.yaml" ]; then \
+		        grep "name:" "$$base/namespace.yaml"; \
+		    elif [ -f "$$base/kustomization.yaml" ]; then \
+		        grep -m1 "^[[:space:]]*namespace:" "$$base/kustomization.yaml" || \
+				kustomize build --enable-helm "$$base" | \
+				grep "^[[:space:]]*namespace:" | \
+				awk '{print $$2}' | \
+				sort | \
+				uniq -c | \
+				sort -r | \
+				head -n 1; \
+		    fi | \
+		    awk '{print $$2}' \
+		)"; \
+		if [ "$$BASE_NAMESPACE" != "$$namespace" ]; then \
+			echo "$$app: base: '$$BASE_NAMESPACE' != '$$namespace'"; \
+			echo; \
+		fi; \
+		if [ -d "$$overlay" ]; then \
+			if [ "$$OVERLAY_NAMESPACE" != "$$namespace" ]; then \
+				echo "$$app: overlay: '$$BASE_NAMESPACE' != '$$namespace'"; \
+				echo; \
+			fi; \
+		fi; \
+	done
+	@echo
+	@if type -P check_bash_syntax.sh >/dev/null 2>&1; then \
+		check_bash_syntax.sh $$(find . -type f -name .envrc); \
+	fi
+
 clean:
 	find . -type d -name charts -exec rm -fr {} \;
 	find . -type f -name kustomization.materialized.yaml -exec rm -f {} \;

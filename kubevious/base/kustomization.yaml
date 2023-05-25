@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2023-02-08 14:09:31 +0000 (Wed, 08 Feb 2023)
+#  Date: 2023-05-24 21:09:36 +0100 (Wed, 24 May 2023)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,21 +15,23 @@
 #
 
 # ============================================================================ #
-#                   EKS Node Termination Handler Kustomization
+#                 K u b e v i o u s   K u s t o m i z a t i o n
 # ============================================================================ #
-
-# https://github.com/aws/aws-node-termination-handler/tree/main/config/helm/aws-node-termination-handler
 
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-#namespace: kube-system
+
+#namespace: kubevious
+
+resources:
+  - namespace.yaml
 
 helmCharts:
-  - name: aws-node-termination-handler
-    repo: https://aws.github.io/eks-charts/
-    version: 0.21.0
-    releaseName: aws-node-termination-handler
-    namespace: kube-system
+  - name: kubevious
+    repo: https://helm.kubevious.io
+    version: 1.1.2
+    releaseName: kubevious
+    namespace: kubevious
     includeCRDs: true
-    #valuesFile: values.yaml
+    valuesFile: values.yaml
